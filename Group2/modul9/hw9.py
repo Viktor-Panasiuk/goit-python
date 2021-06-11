@@ -3,14 +3,16 @@ contacts = {}
 
 def add(cli_parse_string, contacts):
     
-    contacts[cli_parse_string[1]] = cli_parse_string[2]
+    contacts[cli_parse_string[1]] = int(cli_parse_string[2])
     output_line = f'Contact {cli_parse_string[1]} is added to the address book.'
     return output_line
 
 
 def change(cli_parse_string, contacts):
 
-    contacts[cli_parse_string[1]] = cli_parse_string[2]
+    if not contacts.get(cli_parse_string[1]):
+        raise ValueError
+    contacts[cli_parse_string[1]] = int(cli_parse_string[2])
     output_line = f'Contact {cli_parse_string[1]} changed.'
     return output_line
 
@@ -66,7 +68,9 @@ def input_error(func):
         except KeyError:
             return 'Unsuported comand!'
         except IndexError:
-            return 'Not complate comand!'
+            return 'Incomplated comand!'
+        except ValueError:
+            return 'Wrong data!'
     return inner
 
 @input_error
@@ -74,10 +78,8 @@ def handler(cli_parse_string, contacts):
     
     if cli_parse_string[0] == 'good' and cli_parse_string[1] == 'bye':
         result = OPERATIONS['good bye'](cli_parse_string, contacts)
-
     elif cli_parse_string[0] == 'show' and cli_parse_string[1] == 'all':
         result = OPERATIONS['show all'](cli_parse_string, contacts)
-
     else:
         result = OPERATIONS[cli_parse_string[0]](cli_parse_string, contacts)
     return result
@@ -90,8 +92,7 @@ def main():
             continue
         cli_parse_string = comand_parser(cli_string)
         result = handler(cli_parse_string, contacts)
-        #comand = handler(cli_parse_string)
-        #result = comand(cli_parse_string, contacts)
+    
         if result == 'exit':
             break
         else:
